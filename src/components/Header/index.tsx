@@ -1,11 +1,14 @@
 "use client";
-import { PropertySafetyOutlined, PropertySafetyTwoTone } from "@ant-design/icons";
+import { PropertySafetyTwoTone } from "@ant-design/icons";
 import { Row, Col, Image, Layout, Button, Input } from "antd";
 import Link from "next/link";
 import Styles from "./index.module.scss";
+import { useRouter } from "next/navigation";
 const { Header } = Layout;
 const { Search } = Input;
 export default function CommonHeader() {
+  const router = useRouter()
+
   return (
     <Header className={Styles.header}>
       <Row>
@@ -25,12 +28,7 @@ export default function CommonHeader() {
           </Link>
         </Col>
         <Col span={1}>
-          <Link href="/pins">
-            <div>沸点</div>
-          </Link>
-        </Col>
-        <Col span={1}>
-          <Link href="/question">
+          <Link href="/answer">
             <div>问答</div>
           </Link>
         </Col>
@@ -40,7 +38,12 @@ export default function CommonHeader() {
           </Link>
         </Col>
         <Col span={1}>
-          <Link href="/app">
+          <Link href="/course">
+            <div>课程</div>
+          </Link>
+        </Col>
+        <Col span={1}>
+          <Link href="/course">
             <div>App下载</div>
           </Link>
         </Col>
@@ -48,7 +51,7 @@ export default function CommonHeader() {
           <Search placeholder="全站搜索" enterButton allowClear />
         </Col>
         <Col span={3} className="flex justifyEnd">
-          <Button type="primary">创作者中心</Button>
+          <Button type="primary" onClick={() => router.push('/user')}>创作者中心</Button>
         </Col>
         <Col span={2} className='flex justifyEnd'>
           <Link href="/vip">
@@ -59,7 +62,7 @@ export default function CommonHeader() {
           </Link>
         </Col>
         <Col span={3} className="flex justifyCenter">
-          <Button>登录/注册</Button>
+          <Button onClick={() => router.push('/login')}>登录 | 注册</Button>
         </Col>
       </Row>
     </Header>
