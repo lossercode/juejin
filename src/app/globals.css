@@ -1,0 +1,16 @@
+a{
+  color: #000;
+}
+
+.flex{
+  display: flex;
+  align-items: center;
+}
+
+.justifyCenter{
+  justify-content: center;
+}
+
+.justifyEnd{
+  justify-content: flex-end;
+}
