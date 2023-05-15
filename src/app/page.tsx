@@ -21,6 +21,8 @@ export default function Home(){
   const [currentNav, setCurrentNav] = useState<number>(0)
   const [type, setType] = useState('')
   const [filter, setFilter] = useState('')
+  const load = useRef<HTMLSpanElement>(null)
+
   const nav = [
     {id: 0, type: 'recommand', title: '综合', },
     {id: 1, type: 'graduate', title: '考研', },
@@ -50,10 +52,40 @@ export default function Home(){
     const data = res.data
     setDataList(data)
   }
+  const loadData = async (type='', filter='') => {
+    //此处有bug,因为元素的高度都设置了为auto，因此scrolltop一直为0
+    // listBox.current.scrollHeight - listBox.current.scrollTop <= listBox.current.clientHeight
+    
+    const req = await fetch(`http://127.0.0.1:4523/m1/2366702-0-default/api/list?type=${type}&filter=${filter}`,{
+    cache: 'no-cache'
+    })
+    const res = await req.json()
+    const data = res.data
+    setDataList(prevData => [...prevData, ...data])
+    
+  }
 
   useEffect(() => {
     fetchData(type, filter)
+    
+    //使用intersectionObserver实现下来加载
+    let observer = new IntersectionObserver((entry) => {
+      //大于0表示从不可见变为可见
+      if(entry[0].intersectionRatio > 0){
+        loadData(type, filter)
+      }else{
+        return
+      }
+    })
+    observer.observe(load.current as Element)
+
+    return () => {
+      observer.disconnect()
+    }
+
   }, [filter, type])
+
+
   return (
     <div className={Style.container}>
       <Header />
@@ -117,6 +149,7 @@ export default function Home(){
               )
             })
           }
+          <span ref={load}>正在加载</span>
           
         </section>
       </main>
