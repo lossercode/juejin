@@ -65,25 +65,25 @@ export default function Home(){
     
   }
 
-  useEffect(() => {
-    fetchData(type, filter)
+  // useEffect(() => {
+  //   fetchData(type, filter)
     
-    //使用intersectionObserver实现下来加载
-    let observer = new IntersectionObserver((entry) => {
-      //大于0表示从不可见变为可见
-      if(entry[0].intersectionRatio > 0){
-        loadData(type, filter)
-      }else{
-        return
-      }
-    })
-    observer.observe(load.current as Element)
+  //   //使用intersectionObserver实现下来加载
+  //   let observer = new IntersectionObserver((entry) => {
+  //     //大于0表示从不可见变为可见
+  //     if(entry[0].intersectionRatio > 0){
+  //       loadData(type, filter)
+  //     }else{
+  //       return
+  //     }
+  //   })
+  //   observer.observe(load.current as Element)
 
-    return () => {
-      observer.disconnect()
-    }
+  //   return () => {
+  //     observer.disconnect()
+  //   }
 
-  }, [filter, type])
+  // }, [filter, type])
 
 
   return (
