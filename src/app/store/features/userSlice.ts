@@ -12,13 +12,14 @@ export const user = createSlice({
   name: "user",
   initialState,
   reducers: {
-    reset: () => initialState,
     
     login: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
+      localStorage.setItem('token', action.payload)
     },
-    quit: (state, action: PayloadAction<string>) => {
-      state.token = action.payload;
+    quit: (state) => {
+      state.token = '';
+      localStorage.setItem('token', '')
     },
   },
 });

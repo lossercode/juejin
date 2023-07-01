@@ -3,7 +3,7 @@
  * @return {*}
  * @Date: 2023-06-06 23:23:46
  */
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface RequeseConfig{
     method: string;
@@ -12,24 +12,30 @@ export interface RequeseConfig{
     responseType?: string;
     withCredentials?: boolean;
     timeout?: number;
-    Authorization: string;
+    Authorization?: string;
 }
-export function useRequest(url: string, config: RequeseConfig){
+//参考 use-http进行封装
+export default function useRequest(url: string, options: RequeseConfig, dependencies: []){
     const [error, setError] = useState<any>(null)
     const [loading, setLoading] = useState(false)
     const [data, setData] = useState(null)
-    
-    const useFetch = async () => {
+
+    const fetchData = useCallback( async () => {
         try {
             setLoading(true)
-            const response = await fetch(url, config)
-            const data = await response.json()
-            setData(data)
+            const response = await fetch(url, options)
+            const res = await response.json()
+            setData(res.data)
             setLoading(false)
         } catch (error: any) {
             setLoading(false)
             setError(error.message)
         }
-    }
-    return {loading, error, useFetch}
+    }, [url,options])
+
+    useEffect(() => {
+        fetchData()
+    })
+    
+    return {loading, error, data}
 }

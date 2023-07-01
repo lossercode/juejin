@@ -1,9 +1,11 @@
 'use client'
-import Header from "@/components/Header"
+import Header from "@/app/components/Header"
 import Style from './page.module.scss'
 import { useEffect, useState, useCallback, useRef } from "react"
 import { Row, Col, Select, Image } from "antd"
 import { CommentOutlined, EyeOutlined, LikeOutlined } from "@ant-design/icons"
+import { useRouter } from "next/navigation"
+
 export interface List{
   id: number
   author: string
@@ -22,6 +24,7 @@ export default function Home(){
   const [type, setType] = useState('')
   const [filter, setFilter] = useState('')
   const load = useRef<HTMLSpanElement>(null)
+  const router = useRouter()
 
   const nav = [
     {id: 0, type: 'recommand', title: '综合', },
@@ -65,25 +68,25 @@ export default function Home(){
     
   }
 
-  // useEffect(() => {
-  //   fetchData(type, filter)
+  useEffect(() => {
+    fetchData(type, filter)
     
-  //   //使用intersectionObserver实现下来加载
-  //   let observer = new IntersectionObserver((entry) => {
-  //     //大于0表示从不可见变为可见
-  //     if(entry[0].intersectionRatio > 0){
-  //       loadData(type, filter)
-  //     }else{
-  //       return
-  //     }
-  //   })
-  //   observer.observe(load.current as Element)
+    //使用intersectionObserver实现下来加载
+    let observer = new IntersectionObserver((entry) => {
+      //大于0表示从不可见变为可见
+      if(entry[0].intersectionRatio > 0){
+        loadData(type, filter)
+      }else{
+        return
+      }
+    })
+    observer.observe(load.current as Element)
 
-  //   return () => {
-  //     observer.disconnect()
-  //   }
+    return () => {
+      observer.disconnect()
+    }
 
-  // }, [filter, type])
+  }, [filter, type])
 
 
   return (
@@ -114,38 +117,38 @@ export default function Home(){
           {
             dataList.map((item) => {
               return (
-                <div className={Style.list} key={item.id}>
-              <Row style={{height: '20px'}}>
-                <Col span={2}>{item.author}</Col>
-                <Col span={6}>{item.date}</Col>
-                <Col span={6}>{item.topic}</Col>
-              </Row>
-              <Row style={{height: '80px'}} align='middle'>
-                <Col span={item.img ? 18: 24} >
-                  <p style={{fontSize: '16px', fontWeight: 'bolder', color: '#000'}}>{item.title}</p>
-                  <p className={Style.singleText}>{item.des}</p>
-                </Col>
-                { item.img && 
-                  <Col span={6} className="flex justifyCenter">
-                    <Image alt="" src={item.img} width={120} height={80} />
-                  </Col>
-                }
-              </Row>
-              <Row style={{height: '20px'}}>
-                <Col span={2}>
-                  <EyeOutlined />
-                  <span>{item.watch}</span>
-                </Col>
-                <Col span={2}>
-                  <LikeOutlined />
-                  <span>{item.like}</span>
-                </Col>
-                <Col span={2}>
-                  <CommentOutlined />
-                  <span>{item.comment}</span>
-                </Col>
-              </Row>
-          </div>
+                <div className={Style.list} key={item.id} onClick={() => window.open(`/article/${item.id}`)}>
+                  <Row style={{height: '20px'}}>
+                    <Col span={2}>{item.author}</Col>
+                    <Col span={6}>{item.date}</Col>
+                    <Col span={6}>{item.topic}</Col>
+                  </Row>
+                  <Row style={{height: '80px'}} align='middle'>
+                    <Col span={item.img ? 18: 24} >
+                      <p style={{fontSize: '16px', fontWeight: 'bolder', color: '#000'}}>{item.title}</p>
+                      <p className={Style.singleText}>{item.des}</p>
+                    </Col>
+                    { item.img && 
+                      <Col span={6} className="flex justifyCenter">
+                        <Image alt="" src={item.img} width={120} height={80} />
+                      </Col>
+                    }
+                  </Row>
+                  <Row style={{height: '20px'}}>
+                    <Col span={2}>
+                      <EyeOutlined />
+                      <span>{item.watch}</span>
+                    </Col>
+                    <Col span={2}>
+                      <LikeOutlined />
+                      <span>{item.like}</span>
+                    </Col>
+                    <Col span={2}>
+                      <CommentOutlined />
+                      <span>{item.comment}</span>
+                    </Col>
+                  </Row>
+              </div>
               )
             })
           }
