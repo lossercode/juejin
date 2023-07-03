@@ -10,10 +10,10 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const headers = request.headers
   console.log(request.url)
-  if(!headers.get('Authorization') || headers.get('Authorization') === ''){
-    const url = new URL(`/login?from=${request.url}`, request.url)
-    return NextResponse.redirect(url)
-  }
+  // if(!headers.get('Authorization') || headers.get('Authorization') === ''){
+  //   const url = new URL(`/login?from=${request.url}`, request.url)
+  //   return NextResponse.redirect(url)
+  // }
   return
 }
 

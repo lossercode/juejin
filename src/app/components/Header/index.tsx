@@ -63,7 +63,7 @@ export default function CommonHeader() {
           <Search placeholder="全站搜索" enterButton allowClear />
         </Col>
         <Col span={3} className="flex justifyEnd">
-          <Button type="primary" onClick={() => router.push("/user")}>
+          <Button type="primary" onClick={() => router.push("/create")}>
             创作者中心
           </Button>
         </Col>

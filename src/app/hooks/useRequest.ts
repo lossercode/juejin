@@ -3,39 +3,44 @@
  * @return {*}
  * @Date: 2023-06-06 23:23:46
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-export interface RequeseConfig{
-    method: string;
-    data?: any;
-    headers?: any;
-    responseType?: string;
-    withCredentials?: boolean;
-    timeout?: number;
-    Authorization?: string;
+interface RequestOptions {
+  method: string;
+  data?: any;
 }
 //参考 use-http进行封装
-export default function useRequest(url: string, options: RequeseConfig, dependencies: []){
-    const [error, setError] = useState<any>(null)
-    const [loading, setLoading] = useState(false)
-    const [data, setData] = useState(null)
+export default function useRequest(url: string, options: RequestOptions, lazy: boolean = true){
+  const error = useRef<boolean>(false)
+  const message = useRef<string>('')
+  const data = useRef(null)
 
-    const fetchData = useCallback( async () => {
-        try {
-            setLoading(true)
-            const response = await fetch(url, options)
-            const res = await response.json()
-            setData(res.data)
-            setLoading(false)
-        } catch (error: any) {
-            setLoading(false)
-            setError(error.message)
-        }
-    }, [url,options])
+  const doFetch = async () => {
+    console.log('我dofetch运行了')
+    try {
+      const response = await fetch(url, options);
+      const res = await response.json();
+      /**
+       *  根据服务端响应进行处理，服务器响应格式为：
+       *      code: http状态码
+       *      message: 状态说明
+       *      data: 返回的数据
+       */
+      if (res.code >= 400) {
+        error.current = true
+        message.current = res.message
+      } else {
+        data.current = res.data;
+      }
+    } catch (error: any) {
+      message.current = '未知错误'
+    }
+  }
 
-    useEffect(() => {
-        fetchData()
-    })
-    
-    return {loading, error, data}
+  useEffect(() => {
+    if(lazy) return
+    doFetch();
+  });
+
+  return { error, message, data, doFetch };
 }
