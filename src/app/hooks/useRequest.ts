@@ -3,44 +3,71 @@
  * @return {*}
  * @Date: 2023-06-06 23:23:46
  */
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
 interface RequestOptions {
   method: string;
   data?: any;
 }
-//参考 use-http进行封装
-export default function useRequest(url: string, options: RequestOptions, lazy: boolean = true){
-  const error = useRef<boolean>(false)
-  const message = useRef<string>('')
-  const data = useRef(null)
 
-  const doFetch = async () => {
-    console.log('我dofetch运行了')
+export default function useRequest(
+  url: string,
+  options: RequestOptions,
+  lazy: boolean = false
+) {
+
+  // const error = useRef('')
+  // const data = useRef(null)
+  // const [start, setStart]  = useState({current: lazy})
+
+  const initialState = {
+		status: 'idle',
+		error: null,
+		data: [],
+	};
+
+	const [state, dispatch] = useReducer((state: any, action: { type: any; payload?: any; }) => {
+		switch (action.type) {
+			case 'FETCHING':
+				return { ...initialState, status: 'fetching' };
+			case 'FETCHED':
+				return { ...initialState, status: 'fetched', data: action.payload };
+			case 'FETCH_ERROR':
+				return { ...initialState, status: 'error', error: action.payload };
+			default:
+				return state;
+		}
+	}, initialState);
+
+
+  const fetchData = useCallback(async () => {
     try {
+      dispatch({type: 'FETCHING'})
       const response = await fetch(url, options);
       const res = await response.json();
-      /**
-       *  根据服务端响应进行处理，服务器响应格式为：
-       *      code: http状态码
-       *      message: 状态说明
-       *      data: 返回的数据
-       */
       if (res.code >= 400) {
-        error.current = true
-        message.current = res.message
+        dispatch({type: 'FETCH_ERROR', payload: res.message})
+        // error.current = res.message
       } else {
-        data.current = res.data;
+        dispatch({type: 'FETCHED', payload: res.data})
+        // data.current = res.data
       }
-    } catch (error: any) {
-      message.current = '未知错误'
+    } catch (e: any) {
+      dispatch({type: 'FETCH_ERROR', payload: e.message})
+      // error.current = e.message
     }
+  }, [url, options]);
+
+  const run = () => {
+    fetchData()
   }
 
   useEffect(() => {
     if(lazy) return
-    doFetch();
-  });
 
-  return { error, message, data, doFetch };
+    fetchData();
+
+  }, [lazy, fetchData]);
+
+  return { state, run };
 }
